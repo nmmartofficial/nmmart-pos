@@ -9,6 +9,7 @@ import Settings from './Settings';
 function Dashboard({ shop, onLogout }) {
   const [activeTab, setActiveTab] = useState('home');
   const [stats, setStats] = useState({ totalSales: 0, billCount: 0, lowStock: 0 });
+  const isMobile = window.innerWidth < 768;
 
   useEffect(() => {
     if (activeTab === 'home' && shop?.id) {
@@ -40,62 +41,98 @@ function Dashboard({ shop, onLogout }) {
     }
   }
 
+  // --- Styles ---
+  const containerStyle = {
+    display: 'flex',
+    flexDirection: isMobile ? 'column' : 'row',
+    minHeight: '100vh',
+    backgroundColor: '#f0f2f5',
+    fontFamily: 'Segoe UI, Tahoma, Geneva, Verdana, sans-serif'
+  };
+
+  const sidebarStyle = {
+    width: isMobile ? '100%' : '250px',
+    background: '#1a1a2e',
+    color: '#fff',
+    padding: isMobile ? '10px' : '20px',
+    display: 'flex',
+    flexDirection: isMobile ? 'row' : 'column',
+    alignItems: 'center',
+    justifyContent: isMobile ? 'space-around' : 'flex-start',
+    boxShadow: '2px 0 10px rgba(0,0,0,0.1)',
+    position: isMobile ? 'sticky' : 'relative',
+    top: 0,
+    zIndex: 100
+  };
+
+  const navItem = (tab) => ({
+    padding: isMobile ? '8px 12px' : '12px 15px',
+    cursor: 'pointer',
+    borderRadius: '8px',
+    marginBottom: isMobile ? '0' : '8px',
+    fontSize: isMobile ? '12px' : '14px',
+    backgroundColor: activeTab === tab ? '#3498db' : 'transparent',
+    transition: '0.3s',
+    whiteSpace: 'nowrap',
+    textAlign: 'center'
+  });
+
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', fontFamily: 'Arial, sans-serif', background: '#f0f2f5' }}>
+    <div style={containerStyle}>
       
-      {/* --- SIDEBAR (नया और बेहतर) --- */}
+      {/* --- SIDEBAR / TOP NAVIGATION --- */}
       <div style={sidebarStyle}>
-        <div style={{ textAlign: 'center', marginBottom: '30px' }}>
-          <h2 style={{ color: '#fff', margin: 0 }}>{shop.shop_name}</h2>
-          <div style={badgeStyle}>NM OS v7.0 PRO</div>
-        </div>
+        {!isMobile && (
+          <div style={{ textAlign: 'center', marginBottom: '30px', width: '100%' }}>
+            <h2 style={{ color: '#fff', margin: 0, fontSize: '20px' }}>{shop.shop_name}</h2>
+            <span style={{ fontSize: '10px', background: '#3498db', padding: '2px 8px', borderRadius: '10px' }}>v7.0 PRO</span>
+          </div>
+        )}
         
-        <nav style={{ flex: 1 }}>
-          <div onClick={() => setActiveTab('home')} style={{ ...navItem, background: activeTab === 'home' ? '#3498db' : 'transparent' }}>🏠 Dashboard Home</div>
-          <div onClick={() => setActiveTab('billing')} style={{ ...navItem, background: activeTab === 'billing' ? '#3498db' : 'transparent' }}>🛒 Billing Counter</div>
-          <div onClick={() => setActiveTab('inventory')} style={{ ...navItem, background: activeTab === 'inventory' ? '#3498db' : 'transparent' }}>📦 Stock Inventory</div>
-          <div onClick={() => setActiveTab('sales')} style={{ ...navItem, background: activeTab === 'sales' ? '#3498db' : 'transparent' }}>📊 Sales History</div>
-          <div onClick={() => setActiveTab('gst')} style={{ ...navItem, background: activeTab === 'gst' ? '#2ecc71' : 'transparent' }}>📑 GST Report</div>
-          
-          <div style={{ marginTop: '20px', paddingLeft: '10px', fontSize: '11px', color: '#7f8c8d' }}>ADMIN & HELP</div>
-          <div onClick={() => setActiveTab('settings')} style={{ ...navItem, background: activeTab === 'settings' ? '#9b59b6' : 'transparent' }}>⚙️ Store Settings</div>
-          <div onClick={() => setActiveTab('about')} style={{ ...navItem, background: activeTab === 'about' ? '#34495e' : 'transparent' }}>ℹ️ About System</div>
-          <div onClick={() => setActiveTab('help')} style={{ ...navItem, background: activeTab === 'help' ? '#e67e22' : 'transparent' }}>❓ Help & Support</div>
+        <nav style={{ display: 'flex', flexDirection: isMobile ? 'row' : 'column', gap: '5px', overflowX: isMobile ? 'auto' : 'visible', width: '100%' }}>
+          <div onClick={() => setActiveTab('home')} style={navItem('home')}>🏠 {isMobile ? '' : 'Home'}</div>
+          <div onClick={() => setActiveTab('billing')} style={navItem('billing')}>🛒 {isMobile ? 'Bill' : 'Billing'}</div>
+          <div onClick={() => setActiveTab('inventory')} style={navItem('inventory')}>📦 {isMobile ? 'Stock' : 'Inventory'}</div>
+          <div onClick={() => setActiveTab('sales')} style={navItem('sales')}>📊 {isMobile ? 'Sales' : 'History'}</div>
+          {!isMobile && <div onClick={() => setActiveTab('gst')} style={navItem('gst')}>📑 GST Report</div>}
+          <div onClick={() => setActiveTab('settings')} style={{ ...navItem('settings'), backgroundColor: activeTab === 'settings' ? '#9b59b6' : 'transparent' }}>⚙️</div>
         </nav>
 
-        <div onClick={onLogout} style={logoutBtn}>🚪 Logout Session</div>
+        {!isMobile && (
+          <div onClick={onLogout} style={{ marginTop: 'auto', color: '#ff7675', cursor: 'pointer', fontWeight: 'bold', borderTop: '1px solid #34495e', paddingTop: '10px', width: '100%', textAlign: 'center' }}>
+            🚪 Logout
+          </div>
+        )}
       </div>
 
-      {/* --- MAIN CONTENT AREA --- */}
-      <div style={{ flex: 1, padding: '30px', overflowY: 'auto' }}>
+      {/* --- MAIN CONTENT --- */}
+      <div style={{ flex: 1, padding: isMobile ? '15px' : '30px', overflowY: 'auto' }}>
         
         {activeTab === 'home' && (
           <div>
-            <h1>Business Overview</h1>
-            <div style={statsGrid}>
-              <div style={{ ...statCard, borderTop: '5px solid #2ecc71' }}>
-                <small>TODAY'S REVENUE</small>
-                <h2 style={{ color: '#2ecc71', fontSize: '28px' }}>₹{stats.totalSales.toLocaleString()}</h2>
+            <h2 style={{ marginBottom: '20px' }}>NM MART Dashboard</h2>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: '15px' }}>
+              <div style={cardStyle('#2ecc71')}>
+                <small>TODAY'S SALES</small>
+                <h3>₹{stats.totalSales}</h3>
               </div>
-              <div style={{ ...statCard, borderTop: '5px solid #3498db' }}>
+              <div style={cardStyle('#3498db')}>
                 <small>TOTAL BILLS</small>
-                <h2 style={{ color: '#3498db', fontSize: '28px' }}>{stats.billCount}</h2>
+                <h3>{stats.billCount}</h3>
               </div>
-              <div style={{ ...statCard, borderTop: '5px solid #e74c3c' }}>
+              <div style={cardStyle('#e74c3c')}>
                 <small>LOW STOCK</small>
-                <h2 style={{ color: '#e74c3c', fontSize: '28px' }}>{stats.lowStock}</h2>
+                <h3>{stats.lowStock} Items</h3>
               </div>
             </div>
-            
-            <div style={{ marginTop: '30px', background: '#fff', padding: '20px', borderRadius: '10px' }}>
-               <h3>Quick Actions</h3>
-               <button onClick={() => setActiveTab('billing')} style={primaryBtn}>+ New Bill</button>
-               <button onClick={() => setActiveTab('inventory')} style={secondaryBtn}>Check Stock</button>
+
+            <div style={{ marginTop: '25px', display: 'flex', gap: '10px' }}>
+              <button onClick={() => setActiveTab('billing')} style={btnStyle('#3498db')}>+ New Bill</button>
+              <button onClick={() => setActiveTab('inventory')} style={btnStyle('#95a5a6')}>Check Stock</button>
             </div>
           </div>
         )}
 
-        {/* --- Functional Components --- */}
         {activeTab === 'billing' && <Billing shop={shop} />}
         {activeTab === 'inventory' && <Inventory shop={shop} />}
         {activeTab === 'sales' && <SalesHistory shop={shop} />}
@@ -103,35 +140,33 @@ function Dashboard({ shop, onLogout }) {
         {activeTab === 'settings' && <Settings shop={shop} />}
         
         {activeTab === 'about' && (
-          <div style={infoCard}>
+          <div style={{ textAlign: 'center', padding: '40px', backgroundColor: '#fff', borderRadius: '15px' }}>
             <h2>NM MART RETAIL OS</h2>
-            <p>Version 7.0.4 (Latest Stable)</p>
-            <p>Developed for NM Mart, Manjhanpur</p>
+            <p>Version 7.0.5 | Optimized for Mobile</p>
           </div>
         )}
-
-        {activeTab === 'help' && (
-          <div style={infoCard}>
-            <h2>Support Center</h2>
-            <p>Contact: +91 70811 54604</p>
-            <button style={primaryBtn} onClick={() => window.open('https://wa.me/917081154604')}>WhatsApp Support</button>
-          </div>
-        )}
-
       </div>
     </div>
   );
 }
 
-// --- Styles (CSS) ---
-const sidebarStyle = { width: '260px', background: '#1a1a2e', color: '#fff', padding: '25px', display: 'flex', flexDirection: 'column' };
-const navItem = { padding: '12px 15px', cursor: 'pointer', borderRadius: '8px', marginBottom: '5px', fontSize: '14px', transition: '0.2s' };
-const badgeStyle = { background: '#3498db', fontSize: '10px', padding: '3px 10px', borderRadius: '15px', display: 'inline-block' };
-const logoutBtn = { padding: '12px', color: '#ff7675', cursor: 'pointer', fontWeight: 'bold', textAlign: 'center', borderTop: '1px solid #34495e', marginTop: '10px' };
-const statsGrid = { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px', marginTop: '20px' };
-const statCard = { background: '#fff', padding: '20px', borderRadius: '12px', boxShadow: '0 4px 10px rgba(0,0,0,0.05)' };
-const infoCard = { background: '#fff', padding: '40px', borderRadius: '15px', textAlign: 'center' };
-const primaryBtn = { padding: '10px 20px', background: '#3498db', color: '#fff', border: 'none', borderRadius: '5px', cursor: 'pointer', marginRight: '10px' };
-const secondaryBtn = { padding: '10px 20px', background: '#eee', border: 'none', borderRadius: '5px', cursor: 'pointer' };
+// --- Helper Styles ---
+const cardStyle = (color) => ({
+  backgroundColor: '#fff',
+  padding: '20px',
+  borderRadius: '12px',
+  borderLeft: `6px solid ${color}`,
+  boxShadow: '0 4px 6px rgba(0,0,0,0.05)'
+});
+
+const btnStyle = (color) => ({
+  padding: '12px 20px',
+  backgroundColor: color,
+  color: '#fff',
+  border: 'none',
+  borderRadius: '8px',
+  cursor: 'pointer',
+  fontWeight: 'bold'
+});
 
 export default Dashboard;
