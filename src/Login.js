@@ -19,21 +19,22 @@ const Login = ({ setSession }) => {
       if (error) {
         alert("लॉगिन फेल: " + error.message);
       } else {
-        // App.js को सेशन पास करना
+        // App.js को सेशन पास करना, जिससे डैशबोर्ड खुलेगा
         setSession(data.session);
       }
     } catch (err) {
-      alert("तकनीकी खराबी!");
+      // यहाँ से अलर्ट हटा दिया ताकि फालतू मैसेज न आए
+      console.error("Login detail error:", err.message);
     } finally {
       setLoading(false);
     }
   };
 
-  // --- स्टाइलिंग ---
+  // --- प्रीमियम सेंटर लुक (Style) ---
   const containerStyle = {
     display: 'flex', justifyContent: 'center', alignItems: 'center',
     height: '100vh', width: '100vw', backgroundColor: '#1a1a2e',
-    position: 'fixed', top: 0, left: 0
+    position: 'fixed', top: 0, left: 0, margin: 0, fontFamily: 'Arial, sans-serif'
   };
 
   const cardStyle = {
@@ -44,27 +45,46 @@ const Login = ({ setSession }) => {
 
   const inputStyle = {
     width: '100%', padding: '14px', margin: '12px 0',
-    borderRadius: '8px', border: '1px solid #ddd', fontSize: '16px'
+    borderRadius: '8px', border: '1px solid #ddd', fontSize: '16px',
+    boxSizing: 'border-box'
   };
 
   const buttonStyle = {
     width: '100%', padding: '14px', backgroundColor: '#d32f2f',
     color: '#fff', border: 'none', borderRadius: '8px',
-    fontSize: '18px', fontWeight: 'bold', cursor: 'pointer', marginTop: '20px'
+    fontSize: '18px', fontWeight: 'bold', cursor: 'pointer',
+    marginTop: '20px', transition: '0.3s'
   };
 
   return (
     <div style={containerStyle}>
       <div style={cardStyle}>
-        <h1 style={{ color: '#d32f2f', margin: '0', fontWeight: '900' }}>NM MART</h1>
-        <p style={{ color: '#7f8c8d', fontSize: '12px', marginBottom: '30px' }}>RETAIL OS v7.0</p>
+        <div style={{fontSize: '40px', marginBottom: '10px'}}>🏪</div>
+        <h1 style={{ color: '#d32f2f', margin: '0', fontWeight: '900', letterSpacing: '1px' }}>NM MART</h1>
+        <p style={{ color: '#7f8c8d', fontSize: '12px', marginBottom: '30px', fontWeight: 'bold' }}>RETAIL OS v7.0</p>
+        
         <form onSubmit={handleLogin}>
-          <input type="email" placeholder="Store Email" style={inputStyle} value={email} onChange={(e) => setEmail(e.target.value)} required />
-          <input type="password" placeholder="Password" style={inputStyle} value={password} onChange={(e) => setPassword(e.target.value)} required />
+          <input 
+            type="email" 
+            placeholder="Store Email" 
+            style={inputStyle} 
+            value={email} 
+            onChange={(e) => setEmail(e.target.value)} 
+            required 
+          />
+          <input 
+            type="password" 
+            placeholder="Password" 
+            style={inputStyle} 
+            value={password} 
+            onChange={(e) => setPassword(e.target.value)} 
+            required 
+          />
           <button type="submit" style={buttonStyle} disabled={loading}>
             {loading ? "AUTHENTICATING..." : "SECURE LOG IN"}
           </button>
         </form>
+        <p style={{marginTop: '25px', fontSize: '10px', color: '#bdc3c7'}}>Powered by NM MART Tech</p>
       </div>
     </div>
   );
