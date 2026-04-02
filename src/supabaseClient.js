@@ -1,6 +1,8 @@
-import { createClient } from '@supabase/supabase-js'
+import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = 'https://gmbacynvygbibbtlgkrv.supabase.co'
-const supabaseAnonKey = 'sb_publishable_i4uvTlszQ6fXx8M_-bE2LA_Bt62q4CE'
+// आपकी सुपाबेस की सही डिटेल्स
+const supabaseUrl = 'https://gmbacynvygbibbtlgkrv.supabase.co';
+const supabaseAnonKey = 'sb_publishable_i4uvTlszQ6fXx8M_-bE2LA_Bt62q4CE';
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+// क्लाइंट बनाना
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
