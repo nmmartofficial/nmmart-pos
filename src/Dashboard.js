@@ -10,94 +10,103 @@ function Dashboard({ shop, onLogout }) {
   const [activeTab, setActiveTab] = useState('home');
   const isMobile = window.innerWidth < 768;
 
-  // --- MODERN UI STYLES ---
+  // --- MODERN RESPONSIVE STYLES ---
   const containerStyle = {
     display: 'flex',
-    minHeight: '100vh',
-    backgroundColor: '#f8f9fa', // हल्का साफ़ बैकग्राउंड
-    fontFamily: "'Inter', sans-serif",
+    flexDirection: isMobile ? 'column-reverse' : 'row', // मोबाइल पर नेविगेशन नीचे आएगा
+    height: '100vh',
+    width: '100vw',
+    backgroundColor: '#f8f9fa',
+    overflow: 'hidden'
   };
 
   const sidebarStyle = {
-    width: isMobile ? '70px' : '240px',
-    background: '#1e1e2d', // डार्क प्रीमियम नेवी ब्लू
+    width: isMobile ? '100%' : '240px',
+    height: isMobile ? '70px' : '100vh',
+    background: '#1e1e2d',
     color: '#a2a3b7',
     display: 'flex',
-    flexDirection: 'column',
-    transition: 'all 0.3s ease',
-    boxShadow: '4px 0 10px rgba(0,0,0,0.05)',
-    position: 'sticky',
-    top: 0,
-    height: '100vh'
+    flexDirection: isMobile ? 'row' : 'column',
+    boxShadow: isMobile ? '0 -2px 10px rgba(0,0,0,0.1)' : '4px 0 10px rgba(0,0,0,0.05)',
+    zIndex: 1000
   };
 
-  const navItem = (tab, color) => ({
-    padding: '16px 20px',
+  const navItem = (tab) => ({
+    flex: isMobile ? 1 : 'none',
+    padding: isMobile ? '10px 5px' : '15px 20px',
     cursor: 'pointer',
     display: 'flex',
+    flexDirection: 'column',
     alignItems: 'center',
-    justifyContent: isMobile ? 'center' : 'flex-start',
+    justifyContent: 'center',
     backgroundColor: activeTab === tab ? '#2b2b40' : 'transparent',
     color: activeTab === tab ? '#ffffff' : '#a2a3b7',
-    borderLeft: activeTab === tab ? `4px solid ${color || '#0095ff'}` : '4px solid transparent',
+    borderTop: isMobile && activeTab === tab ? '3px solid #0095ff' : 'none',
+    borderLeft: !isMobile && activeTab === tab ? '4px solid #0095ff' : 'none',
     transition: '0.2s',
-    fontSize: '14px',
-    fontWeight: activeTab === tab ? '600' : '400',
-    marginBottom: '4px'
+    fontSize: isMobile ? '10px' : '14px'
   });
 
-  const mainContentStyle = {
+  const contentAreaStyle = {
     flex: 1,
-    padding: isMobile ? '15px' : '30px',
-    overflowY: 'auto'
+    height: isMobile ? 'calc(100vh - 70px)' : '100vh',
+    overflowY: 'auto',
+    padding: isMobile ? '10px' : '30px',
+    boxSizing: 'border-box',
+    width: '100%'
   };
 
   return (
     <div style={containerStyle}>
-      {/* --- SIDEBAR --- */}
+      {/* --- NAVIGATION (SIDEBAR for Desktop / BOTTOM BAR for Mobile) --- */}
       <div style={sidebarStyle}>
-        <div style={{ padding: '25px 20px', textAlign: 'center', borderBottom: '1px solid #2b2b40' }}>
-          {!isMobile ? (
-            <h2 style={{ color: '#fff', margin: 0, fontSize: '18px', letterSpacing: '1px' }}>NM MART</h2>
-          ) : (
-            <span style={{ fontSize: '24px' }}>🏪</span>
+        {!isMobile && (
+          <div style={{ padding: '25px 20px', textAlign: 'center', borderBottom: '1px solid #2b2b40' }}>
+            <h2 style={{ color: '#fff', margin: 0, fontSize: '18px' }}>NM MART</h2>
+          </div>
+        )}
+
+        <nav style={{ flex: 1, display: 'flex', flexDirection: isMobile ? 'row' : 'column', width: '100%' }}>
+          <div onClick={() => setActiveTab('home')} style={navItem('home')}>
+             <span style={{fontSize: '20px'}}>🏠</span> {!isMobile && 'Dashboard'}
+          </div>
+          <div onClick={() => setActiveTab('billing')} style={navItem('billing')}>
+             <span style={{fontSize: '20px'}}>🛒</span> {!isMobile && 'Billing'}
+          </div>
+          <div onClick={() => setActiveTab('inventory')} style={navItem('inventory')}>
+             <span style={{fontSize: '20px'}}>📦</span> {!isMobile && 'Inventory'}
+          </div>
+          <div onClick={() => setActiveTab('sales')} style={navItem('sales')}>
+             <span style={{fontSize: '20px'}}>📊</span> {!isMobile && 'History'}
+          </div>
+          <div onClick={() => setActiveTab('gst')} style={navItem('gst')}>
+             <span style={{fontSize: '20px'}}>📑</span> {!isMobile && 'GST'}
+          </div>
+          <div onClick={() => setActiveTab('settings')} style={navItem('settings')}>
+             <span style={{fontSize: '20px'}}>⚙️</span> {!isMobile && 'Settings'}
+          </div>
+          {!isMobile && (
+            <div onClick={onLogout} style={{ ...navItem('logout'), color: '#f64e60', marginTop: 'auto' }}>
+              <span>🚪</span> Logout
+            </div>
           )}
-        </div>
-
-        <nav style={{ flex: 1, marginTop: '15px' }}>
-          <div onClick={() => setActiveTab('home')} style={navItem('home', '#0095ff')}>
-             <span style={{marginRight: isMobile ? 0 : '12px'}}>🏠</span> {!isMobile && 'Dashboard Home'}
-          </div>
-          <div onClick={() => setActiveTab('billing')} style={navItem('billing', '#10b981')}>
-             <span style={{marginRight: isMobile ? 0 : '12px'}}>🛒</span> {!isMobile && 'Billing Counter'}
-          </div>
-          <div onClick={() => setActiveTab('inventory')} style={navItem('inventory', '#f59e0b')}>
-             <span style={{marginRight: isMobile ? 0 : '12px'}}>📦</span> {!isMobile && 'Stock Inventory'}
-          </div>
-          <div onClick={() => setActiveTab('sales')} style={navItem('sales', '#8b5cf6')}>
-             <span style={{marginRight: isMobile ? 0 : '12px'}}>📊</span> {!isMobile && 'Sales History'}
-          </div>
-          <div onClick={() => setActiveTab('gst')} style={navItem('gst', '#ef4444')}>
-             <span style={{marginRight: isMobile ? 0 : '12px'}}>📑</span> {!isMobile && 'GST Report'}
-          </div>
-          <div onClick={() => setActiveTab('settings')} style={navItem('settings', '#64748b')}>
-             <span style={{marginRight: isMobile ? 0 : '12px'}}>⚙️</span> {!isMobile && 'Store Settings'}
-          </div>
         </nav>
-
-        <div onClick={onLogout} style={{ ...navItem('logout'), color: '#f64e60', borderTop: '1px solid #2b2b40', marginTop: 'auto' }}>
-          <span style={{marginRight: isMobile ? 0 : '12px'}}>🚪</span> {!isMobile && 'Logout Session'}
-        </div>
       </div>
 
-      {/* --- MAIN AREA --- */}
-      <div style={mainContentStyle}>
-        <div style={{ backgroundColor: '#fff', padding: '20px', borderRadius: '12px', boxShadow: '0 2px 15px rgba(0,0,0,0.03)' }}>
+      {/* --- MAIN CONTENT AREA (No Overlap Now) --- */}
+      <div style={contentAreaStyle}>
+        <div style={{ 
+          backgroundColor: '#fff', 
+          minHeight: '100%', 
+          borderRadius: isMobile ? '0' : '12px', 
+          padding: isMobile ? '10px' : '20px',
+          boxShadow: '0 2px 15px rgba(0,0,0,0.05)'
+        }}>
           {activeTab === 'home' && (
-             <div>
-               <h3 style={{ color: '#1e1e2d', marginTop: 0 }}>Business Overview</h3>
-               <p style={{ color: '#b5b5c3' }}>Welcome back, NM Mart Management!</p>
-               {/* यहाँ आप अपने स्टैट्स कार्ड्स डाल सकते हैं */}
+             <div style={{textAlign: 'center', paddingTop: '20px'}}>
+               <h3 style={{margin: 0}}>NM MART - RETAIL OS</h3>
+               <p style={{color: '#888'}}>Welcome, Abdul!</p>
+               <button onClick={onLogout} style={{display: isMobile ? 'block' : 'none', margin: '20px auto', color: 'red'}}>Logout</button>
              </div>
           )}
           
