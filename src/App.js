@@ -1,26 +1,59 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { supabase } from './supabaseClient';
 import Login from './Login';
 import Dashboard from './Dashboard';
 
 function App() {
-  const [userShop, setUserShop] = useState(null);
+  const [session, setSession] = useState(null);
+  const [shop, setShop] = useState(null);
 
-  // जब लॉगिन सफल हो जाए
-  const handleLoginSuccess = (shopData) => {
-    setUserShop(shopData);
+  useEffect(() => {
+    // 1. चेक करें कि यूजर लॉगिन है या नहीं
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      if (session) fetchShopData(session.user.email);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+      if (session) fetchShopData(session.user.email);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  // 2. 'shops' टेबल से दुकानदार का डेटा लाना (NM MART का डेटा यहाँ से आएगा)
+  async function fetchShopData(email) {
+    const { data, error } = await supabase
+      .from('shops')
+      .select('*')
+      .eq('owner_email', email)
+      .single();
+
+    if (!error && data) {
+      setShop(data);
+    }
+  }
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    setSession(null);
+    setShop(null);
   };
 
-  // लॉगआउट करने पर
-  const handleLogout = () => {
-    setUserShop(null);
-  };
-
+  // --- स्क्रीन रेंडरिंग ---
   return (
     <div className="App">
-      {userShop ? (
-        <Dashboard shop={userShop} onLogout={handleLogout} />
+      {!session ? (
+        // अगर लॉगिन नहीं है तो Login.js दिखेगा
+        <Login /> 
+      ) : shop ? (
+        // अगर लॉगिन है तो Dashboard.js दिखेगा और उसे 'shop' का डेटा मिलेगा
+        <Dashboard shop={shop} onLogout={handleLogout} />
       ) : (
-        <Login onLoginSuccess={handleLoginSuccess} />
+        <div style={{ textAlign: 'center', marginTop: '50px' }}>
+          शॉप डेटा लोड हो रहा है... कृपया अपनी 'shops' टेबल में ईमेल चेक करें।
+        </div>
       )}
     </div>
   );
