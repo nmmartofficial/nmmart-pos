@@ -1,14 +1,36 @@
 import React, { useState } from 'react';
 import { User, Lock, ArrowRight, ShoppingCart } from 'lucide-react';
+import { useNavigate } from 'react-router-dom'; // पेज बदलने के लिए ज़रूरी
+import { authService } from '../services/authService'; // Supabase से जुड़ने के लिए
 import Button from '../components/Button';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    console.log('Logging in with:', email, password);
+    setLoading(true);
+
+    try {
+      // 1. असली लॉगिन यहाँ हो रहा है
+      const { data, error } = await authService.login(email, password);
+
+      if (error) {
+        // अगर ईमेल या पासवर्ड गलत है
+        alert("Login Failed: " + error.message);
+      } else if (data.user) {
+        // 2. लॉगिन सफल होने पर Inventory पर भेजें
+        console.log('Success! Welcome to NM MART');
+        navigate('/inventory'); 
+      }
+    } catch (err) {
+      alert("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -26,6 +48,7 @@ const Login = () => {
         {/* Login Card */}
         <div className="bg-slate-900 border border-slate-800 p-8 rounded-[2rem] shadow-2xl shadow-black/50">
           <form onSubmit={handleLogin} className="space-y-6">
+            {/* Email Field */}
             <div className="space-y-2">
               <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider ml-1">Email Address</label>
               <div className="relative group">
@@ -41,6 +64,7 @@ const Login = () => {
               </div>
             </div>
 
+            {/* Password Field */}
             <div className="space-y-2">
               <div className="flex justify-between items-center ml-1">
                 <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Password</label>
@@ -59,12 +83,14 @@ const Login = () => {
               </div>
             </div>
 
+            {/* Sign In Button */}
             <Button 
               type="submit" 
-              className="w-full py-4 text-base rounded-2xl mt-4" 
-              icon={ArrowRight}
+              className={`w-full py-4 text-base rounded-2xl mt-4 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`} 
+              icon={loading ? null : ArrowRight}
+              disabled={loading}
             >
-              Sign In to Dashboard
+              {loading ? 'Signing In...' : 'Sign In to Dashboard'}
             </Button>
           </form>
 
