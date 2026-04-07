@@ -13,7 +13,7 @@ export const AuthProvider = ({ children }) => {
   // Optimized profile fetching for Retail OS
   const fetchProfile = async (userId) => {
     try {
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from('profiles')
         .select('business_name, license_valid_until, is_active')
         .eq('id', userId)

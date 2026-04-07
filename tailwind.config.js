@@ -8,6 +8,9 @@ module.exports = {
       fontFamily: {
         sans: ['Inter', 'sans-serif'],
       },
+      colors: {
+        'golden-yellow': '#f2c94c',
+      },
     },
   },
   plugins: [],

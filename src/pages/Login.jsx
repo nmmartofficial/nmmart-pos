@@ -44,18 +44,18 @@ const Login = () => {
   };
 
   return (
-    <div className="flex h-screen items-center justify-center bg-blue-600 p-4">
-      <div className="bg-white p-8 rounded-[35px] shadow-2xl w-full max-w-md">
-        <h2 className="text-3xl font-black text-slate-800 mb-2 text-center uppercase italic">
+    <div className="flex h-screen items-center justify-center bg-white p-4">
+      <div className="bg-white p-8 rounded-[35px] shadow-lg border border-gray-200 w-full max-w-md">
+        <h2 className="text-3xl font-black text-gray-900 mb-2 text-center uppercase italic">
           NM MART OS
         </h2>
-        <p className="text-center text-slate-500 mb-8 font-bold">PLEASE SIGN IN</p>
+        <p className="text-center text-gray-600 mb-8 font-bold">PLEASE SIGN IN</p>
         
         <form onSubmit={handleLogin} className="space-y-4">
           <input 
             type="email" 
             placeholder="Email Address" 
-            className="w-full p-4 rounded-2xl bg-slate-100 border-none font-bold outline-blue-500"
+            className="w-full p-4 rounded-2xl bg-gray-100 border border-gray-200 font-bold outline-golden-yellow text-gray-900"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
@@ -63,7 +63,7 @@ const Login = () => {
           <input 
             type="password" 
             placeholder="Password" 
-            className="w-full p-4 rounded-2xl bg-slate-100 border-none font-bold outline-blue-500"
+            className="w-full p-4 rounded-2xl bg-gray-100 border border-gray-200 font-bold outline-golden-yellow text-gray-900"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
@@ -71,7 +71,7 @@ const Login = () => {
           <button 
             type="submit" 
             disabled={loading}
-            className="w-full bg-blue-600 text-white p-4 rounded-2xl font-black shadow-lg hover:bg-blue-700 transition-all disabled:bg-slate-400"
+            className="w-full bg-golden-yellow text-gray-900 p-4 rounded-2xl font-black shadow-md hover:bg-yellow-500 transition-all disabled:bg-gray-300 disabled:text-gray-500"
           >
             {loading ? 'SIGNING IN...' : 'LOGIN TO SYSTEM'}
           </button>
