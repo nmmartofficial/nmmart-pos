@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
-import { User, Lock, ArrowRight, ShoppingCart } from 'lucide-react';
-import { useNavigate } from 'react-router-dom'; // पेज बदलने के लिए ज़रूरी
-import { authService } from '../services/authService'; // Supabase से जुड़ने के लिए
-import Button from '../components/Button';
+import { supabase } from '../services/supabaseClient';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -13,106 +11,71 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
-
+    
     try {
-      // 1. असली लॉगिन यहाँ हो रहा है
-      const { data, error } = await authService.login(email, password);
+      // High-speed sign-in logic
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password: password,
+      });
 
       if (error) {
-        // अगर ईमेल या पासवर्ड गलत है
-        alert("Login Failed: " + error.message);
-      } else if (data.user) {
-        // 2. लॉगिन सफल होने पर Inventory पर भेजें
-        console.log('Success! Welcome to NM MART');
-        navigate('/inventory'); 
+        // Specifically handling the email confirmation issue
+        if (error.message.includes('Email not confirmed')) {
+          alert("PLEASE CHECK YOUR EMAIL: Your account is registered but needs verification. Check your inbox for the confirmation link.");
+        } else {
+          alert("LOGIN ERROR: " + error.message);
+        }
+        setLoading(false);
+        return;
+      }
+
+      if (data?.user) {
+        console.log("Retail OS Login Success");
+        // Redirecting instantly to dashboard
+        navigate('/', { replace: true });
       }
     } catch (err) {
-      alert("Something went wrong. Please try again.");
+      console.error("Login System Error:", err);
+      alert("CRITICAL ERROR: Please contact system admin.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 font-['Inter'] flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        {/* Logo Section */}
-        <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-red-600 rounded-3xl mx-auto flex items-center justify-center shadow-2xl shadow-red-900/40 mb-4 ring-1 ring-red-500/50">
-            <ShoppingCart className="w-8 h-8 text-white" />
-          </div>
-          <h1 className="text-3xl font-bold text-white tracking-tight">NM MART Retail OS</h1>
-          <p className="text-slate-500 mt-2 text-sm uppercase tracking-widest font-medium">Wholesale Management SaaS</p>
-        </div>
-
-        {/* Login Card */}
-        <div className="bg-slate-900 border border-slate-800 p-8 rounded-[2rem] shadow-2xl shadow-black/50">
-          <form onSubmit={handleLogin} className="space-y-6">
-            {/* Email Field */}
-            <div className="space-y-2">
-              <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider ml-1">Email Address</label>
-              <div className="relative group">
-                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-600 group-focus-within:text-red-500 transition-colors" />
-                <input 
-                  type="email" 
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@nmmart.com" 
-                  className="w-full pl-12 pr-4 py-3.5 bg-slate-950 border border-slate-800 rounded-2xl text-slate-200 placeholder-slate-700 focus:outline-none focus:ring-2 focus:ring-red-500/50 focus:border-red-500/50 transition-all"
-                  required
-                />
-              </div>
-            </div>
-
-            {/* Password Field */}
-            <div className="space-y-2">
-              <div className="flex justify-between items-center ml-1">
-                <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Password</label>
-                <button type="button" className="text-xs font-semibold text-red-500 hover:text-red-400 transition-colors">Forgot Password?</button>
-              </div>
-              <div className="relative group">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-600 group-focus-within:text-red-500 transition-colors" />
-                <input 
-                  type="password" 
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••" 
-                  className="w-full pl-12 pr-4 py-3.5 bg-slate-950 border border-slate-800 rounded-2xl text-slate-200 placeholder-slate-700 focus:outline-none focus:ring-2 focus:ring-red-500/50 focus:border-red-500/50 transition-all"
-                  required
-                />
-              </div>
-            </div>
-
-            {/* Sign In Button */}
-            <Button 
-              type="submit" 
-              className={`w-full py-4 text-base rounded-2xl mt-4 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`} 
-              icon={loading ? null : ArrowRight}
-              disabled={loading}
-            >
-              {loading ? 'Signing In...' : 'Sign In to Dashboard'}
-            </Button>
-          </form>
-
-          {/* Branding */}
-          <div className="mt-8 text-center pt-6 border-t border-slate-800">
-            <p className="text-slate-500 text-xs font-medium italic tracking-wide">
-              Powered by <span className="text-slate-400 font-bold not-italic">NM Mart</span>
-            </p>
-          </div>
-        </div>
-
-        {/* Footer Info */}
-        <div className="text-center mt-8 space-y-2">
-          <p className="text-slate-600 text-xs">Public sign-ups are disabled. Contact Admin for access.</p>
-          <div className="flex justify-center gap-4 text-[10px] text-slate-700 font-bold uppercase tracking-[0.2em]">
-            <a href="#!" className="hover:text-slate-500 transition-colors">Support</a>
-            <span>•</span>
-            <a href="#!" className="hover:text-slate-500 transition-colors">Privacy</a>
-            <span>•</span>
-            <a href="#!" className="hover:text-slate-500 transition-colors">Terms</a>
-          </div>
-        </div>
+    <div className="flex h-screen items-center justify-center bg-blue-600 p-4">
+      <div className="bg-white p-8 rounded-[35px] shadow-2xl w-full max-w-md">
+        <h2 className="text-3xl font-black text-slate-800 mb-2 text-center uppercase italic">
+          NM MART OS
+        </h2>
+        <p className="text-center text-slate-500 mb-8 font-bold">PLEASE SIGN IN</p>
+        
+        <form onSubmit={handleLogin} className="space-y-4">
+          <input 
+            type="email" 
+            placeholder="Email Address" 
+            className="w-full p-4 rounded-2xl bg-slate-100 border-none font-bold outline-blue-500"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          <input 
+            type="password" 
+            placeholder="Password" 
+            className="w-full p-4 rounded-2xl bg-slate-100 border-none font-bold outline-blue-500"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+          <button 
+            type="submit" 
+            disabled={loading}
+            className="w-full bg-blue-600 text-white p-4 rounded-2xl font-black shadow-lg hover:bg-blue-700 transition-all disabled:bg-slate-400"
+          >
+            {loading ? 'SIGNING IN...' : 'LOGIN TO SYSTEM'}
+          </button>
+        </form>
       </div>
     </div>
   );

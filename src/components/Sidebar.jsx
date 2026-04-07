@@ -1,49 +1,39 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Receipt, Package, BarChart3, User, LogOut } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import { LayoutDashboard, LogOut, ShoppingBag } from 'lucide-react';
+import { supabase } from '../services/supabaseClient'; // यहाँ भी 'services'
 
 const Sidebar = () => {
-  const menuItems = [
-    { name: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
-    { name: 'Billing', icon: Receipt, path: '/billing' },
-    { name: 'Inventory', icon: Package, path: '/inventory' },
-    { name: 'Reports', icon: BarChart3, path: '/reports' },
-    { name: 'Account', icon: User, path: '/account' },
-  ];
+  const { profile } = useAuth();
 
   return (
-    <div className="flex flex-col h-full bg-slate-900 text-white w-16 md:w-64 transition-all duration-300 border-r border-slate-800">
-      <div className="flex items-center justify-center h-16 border-b border-slate-800">
-        <span className="text-xl font-bold text-red-500 md:block hidden uppercase tracking-wider">NM MART</span>
-        <span className="text-xl font-bold text-red-500 md:hidden block">NM</span>
-      </div>
-      
-      <div className="flex-1 py-4 overflow-y-auto">
-        <nav className="space-y-2 px-2">
-          {menuItems.map((item) => (
-            <NavLink
-              key={item.name}
-              to={item.path}
-              className={({ isActive }) =>
-                `flex items-center px-3 py-3 rounded-xl transition-all duration-200 group ${
-                  isActive ? 'bg-red-600 text-white' : 'hover:bg-slate-800 text-slate-400 hover:text-white'
-                }`
-              }
-            >
-              <item.icon className="w-6 h-6 shrink-0" />
-              <span className="ml-3 font-medium hidden md:block">{item.name}</span>
-            </NavLink>
-          ))}
-        </nav>
+    <aside className="w-64 bg-white border-r border-slate-200 h-screen flex flex-col p-6 shadow-sm">
+      <div className="mb-10">
+        <h2 className="text-2xl font-black text-blue-600 tracking-tight">NM MART</h2>
+        <p className="text-[10px] font-bold text-slate-400 tracking-widest uppercase">Retail OS v5.0</p>
       </div>
 
-      <div className="p-2 border-t border-slate-800">
-        <button className="flex items-center w-full px-3 py-3 rounded-xl hover:bg-slate-800 text-slate-400 hover:text-white transition-all duration-200">
-          <LogOut className="w-6 h-6 shrink-0" />
-          <span className="ml-3 font-medium hidden md:block text-sm">Logout</span>
+      <nav className="flex-1 space-y-2">
+        <div className="flex items-center gap-3 p-3 rounded-xl bg-yellow-400 text-slate-900 shadow-lg font-bold cursor-pointer">
+          <LayoutDashboard size={20} /> <span>Dashboard</span>
+        </div>
+        <div className="flex items-center gap-3 p-3 rounded-xl text-slate-400 hover:bg-slate-50 cursor-pointer">
+          <ShoppingBag size={20} /> <span>Inventory</span>
+        </div>
+      </nav>
+
+      <div className="pt-6 border-t border-slate-100">
+        <div className="flex items-center gap-3 mb-4 p-2">
+          <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-xs uppercase shadow-md">
+            {profile?.business_name?.charAt(0) || 'N'}
+          </div>
+          <p className="text-sm font-bold text-slate-700 truncate">{profile?.business_name || 'My Store'}</p>
+        </div>
+        <button onClick={() => supabase.auth.signOut()} className="flex items-center gap-3 text-red-500 font-bold p-3 w-full hover:bg-red-50 rounded-xl transition-all">
+          <LogOut size={20} /> <span>Sign Out</span>
         </button>
       </div>
-    </div>
+    </aside>
   );
 };
 

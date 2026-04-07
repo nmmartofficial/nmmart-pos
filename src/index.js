@@ -5,7 +5,11 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { CapacitorUpdater } from '@capgo/capacitor-updater';
 
-CapacitorUpdater.notifyAppReady();
+try {
+  CapacitorUpdater.notifyAppReady();
+} catch (e) {
+  console.log('CapacitorUpdater not available');
+}
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
