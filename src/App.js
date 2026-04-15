@@ -10,6 +10,7 @@ import Profile from './pages/Profile';
 import Reports from './pages/Reports';
 import NewBilling from './pages/NewBilling';
 import ExpenseManager from './pages/ExpenseManager';
+import Admin from './pages/Admin';
 import Navbar from './components/Navbar';
 import BottomNavBar from './components/BottomNavBar';
 
@@ -69,6 +70,9 @@ function App() {
           <Route path="/reports" element={<PrivateRoute><Reports /></PrivateRoute>} />
           <Route path="/new-billing" element={<PrivateRoute><NewBilling /></PrivateRoute>} />
           <Route path="/expense-manager" element={<PrivateRoute><ExpenseManager /></PrivateRoute>} />
+
+          {/* Admin Dashboard */}
+          <Route path="/admin" element={<Admin />} />
 
           {/* Redirect to dashboard if route not found */}
           <Route path="*" element={<Navigate to="/" replace />} />
